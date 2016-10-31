@@ -34,7 +34,8 @@
     "jsonpath"
   ],
   "dependencies": {
-    "jsonpath": "^0.2.7",
+    "jsonpath": "kristianmandrup/jsonpath#master",
     "lodash.merge": "^4.6.0"
-  }
+  },
+  "license": "MIT"
 }

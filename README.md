@@ -1,6 +1,8 @@
 # JSON Operator
 
-Perform efficient path based operations on JSON Objects (or most Javascript data object)
+Perform efficient path based operations on JSON Objects (or most Javascript data object).
+
+Uses [jsonpath](https://github.com/kristianmandrup/jsonpath) with new `delete` option for `apply`.
 
 ## Install
 
@@ -10,7 +12,7 @@ Perform efficient path based operations on JSON Objects (or most Javascript data
 
 - constructor(target, path, jp)
 
-- setters/getters 
+- setters/getters
   - .path : default operator path
   - .target : target object
   - .jp : jsonpath engine
@@ -26,12 +28,41 @@ Note that `indent`, `path` and `opts` are optional.
 - query(path) : get all match results in list
 - value(path) : get first match result
 - parent(path) : parent of first match
-- delete(path) : delete all matches
+- delete(path) : delete matches
+- deleteListItem(removeObj, path) : delete matches from Array parent
 - set(obj, path) : set matches to new object
 - merge(obj, opts) : merge matches with new object
 - deepMerge(obj, opts) : deep merge matches with new object 
 - reverseMerge(obj, opts) : merge matches with new object
 - apply(fn, path) : apply function on all path matches (delegates to `jsonpath` function `apply`)
+
+For `delete` and `deleteListItem` you can pass a special `removeObj` when deleting from a parent Array node.
+
+For common cases when removing by an identity key:
+
+```js
+{
+  removeItem: {
+    key: 'id'
+  }
+}
+```
+
+Or even more convenient
+
+```js
+{
+  removeItemMatching: 'id'
+}
+```
+
+
+You can create custom remove functionality with apply as demonstrated here:
+
+- [remove obj example](https://github.com/kristianmandrup/jsonpath/blob/master/test/sugar.js#L69)
+- [remove function example](https://github.com/kristianmandrup/jsonpath/blob/master/test/sugar.js#L42)
+
+Then add your custom delete function to the operator object or the class `.prototype`.
 
 ## Usage
 
