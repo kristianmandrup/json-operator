@@ -37,10 +37,15 @@ let book3Merged = operator.value()
 
 console.log('original book 3', book3)
 console.log('book 3 set', book3Set)
-console.log('book 3 set', book3Merged)
+console.log('book 3 merged', book3Merged)
 
 // for reverse merge, use any of:  
 // operator.merge({price: 100}, {reverse: true})
 // operator.merge({price: 100}, {reverse: true, path: mergePath})
 // operator.reverseMerge({price: 100})
 // operator.reverseMerge({price: 100}, path)
+
+operator.delete()
+let book3deleted = operator.value()
+console.log('book 3 deleted', book3deleted)
+console.log('store after all operations', operator.targetAsStr())

@@ -55,6 +55,8 @@ We perform the following operations to:
 - overwrite book 3 with book [2]
 - merge `{price:100}` onto book [3]
 - reverse order merge `{rating: 4}` onto book [3]
+- delete book [3]
+- display full target object after operations
 
 Full API example
 
@@ -100,6 +102,11 @@ console.log('book 3 set', book3Merged)
 operator.merge({rating: 4}, {reverse: true, path: mergePath})
 operator.reverseMerge({rating: 4})
 operator.reverseMerge({rating: 4}, path)
+
+operator.delete()
+let book3deleted = operator.value()
+console.log('book 3 deleted', book3deleted)
+console.log('store after all operations', operator.targetAsStr())
 ```
 
 The example can be found in `/examples/demo.js` in the repo. 

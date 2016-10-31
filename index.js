@@ -1,10 +1,29 @@
 const jp = require('jsonpath');
 const merge = require('lodash.merge');
 
+function extractPath(opts) {
+  switch (typeof opts) {
+    case 'string':
+      return opts
+    case 'object':
+      return opts.path
+    default:
+      return undefined
+  }
+}
+
 module.exports = class JsonOperator {
   constructor(target, path) {
     this.target = target;
     this.path = path; 
+  }
+
+  targetAsStr(indent = 2) {
+    return JSON.stringify(this.target, null, indent);
+  }
+
+  display(indent = 2, logger = console.log) {
+    logger(this.targetAsStr(indent))
   }
 
   get(path) {
@@ -22,21 +41,20 @@ module.exports = class JsonOperator {
 
   delete(path) {
     this.apply((value) => {
-      value = undefined;
+      return undefined;
     }, path)    
   }
 
   set(obj, path) {    
     this.apply((value) => {
-      console.log('set', value, 'WITH', obj)
       return obj;
     }, path)    
   }
 
-  merge(obj, opts = {}) {    
+  merge(obj, opts = {}) {
     this.apply((value) => {
       return opts.reverse ? merge({}, obj, value) : merge({}, value, obj);
-    }, opts.path || opts)    
+    }, extractPath(opts))    
   }
 
   reverseMerge(obj, path) {
