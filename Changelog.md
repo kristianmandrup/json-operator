@@ -1,5 +1,15 @@
 ## Changelog
 
+### 1.2.0
+
+- Introduce `and` getter as alias for `withSame`
+- Using `with(path)`, `.withSame` and `done()` for improved mutation scoping
+
+### 1.1.2
+
+- Add `.lastPath` and `.withSame` for better chaining :)
+- Add history with `path` and `operation` for each modification.
+
 ### 1.1.1
 
 Added chaining on mutator operations :)

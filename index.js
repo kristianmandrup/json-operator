@@ -21,9 +21,14 @@ module.exports = class JsonOperator {
     const { path, jsonpath, mergeFun, createMerge } = opts;
     this.target = target;
     this.path = path;
+    this.paths = [];
     this.jp = jsonpath || jp;
     this.createMerge = createMerge;
     this.mergeOp = mergeFun || merge; // by default use lodash merge
+
+    this.withPaths = []; // scope stack
+    // aliases
+    this.and = this.withSame;
   }
 
   get result() {
@@ -50,13 +55,34 @@ module.exports = class JsonOperator {
     return this.jp.parent(this.target, path || this.path);
   }
 
+  with(path) {
+    this.withPaths.push(path);
+    return this;
+  }
+
+  get withSame() {
+    return this.with(this.lastPath);
+  }
+
+  done() {
+    this.withPaths.pop();
+    return this;
+  }
+
+
+  get history() {
+    return this.paths;
+  }
+
+  // MUTATIONS
+
   // returning ':delete:' causes node to be deleted from parent obj by key :)
   // If parent is Array, use special remove object:
   //
   // - https://github.com/kristianmandrup/jsonpath/blob/master/test/sugar.js#L43
   // - https://github.com/kristianmandrup/jsonpath/blob/master/test/sugar.js#L69
 
-  delete(path, removeObj) {
+  delete(path, removeObj, operation) {
     return this.apply((value) => {
 
       // TODO: refactor
@@ -81,25 +107,25 @@ module.exports = class JsonOperator {
       }
 
       return removeObj || ':delete:';
-    }, path)
+    }, path, operation || 'delete')
   }
 
   deleteItem(removeObj, path) {
-    return this.delete(path, removeObj)
+    return this.delete(path, removeObj, 'deleteItem')
   }
 
   overwrite(obj, path) {
     return this.apply((value) => {
       return obj;
-    }, path)
+    }, path, 'overwrite')
   }
 
   deepMerge(obj, opts = {}) {
     opts.deep = true
-    return this.merge(obj, opts)
+    return this.merge(obj, opts, 'deepMerge')
   }
 
-  merge(obj, opts = {}) {
+  merge(obj, opts = {}, operation) {
     let mergeOp;
     mergeOp = mergeOp || (opts || opts.type == 'deep' || opts.deep) ? this.mergeOp : Object.assign;
 
@@ -111,15 +137,25 @@ module.exports = class JsonOperator {
       }
 
       return opts.reverse ? mergeOp({}, obj, value) : mergeOp({}, value, obj);
-    }, extractPath(opts))
+    }, extractPath(opts), operation || 'merge')
   }
 
   reverseMerge(obj, path) {
-    return this.merge(obj, { reverse: true, path: path })
+    return this.merge(obj, { reverse: true, path: path }, 'reverseMerge')
   }
 
-  apply(fn, path) {
-    this.jp.apply(this.target, path || this.path, fn);
+  apply(fn, path, operation) {
+    let latestWithPath = this.withPaths[this.withPaths.length];
+
+    this.lastPath = path || latestWithPath || this.lastPath || this.path;
+
+    // build history
+    this.paths.push({
+      path: this.lastPath,
+      operation: operation
+    });
+
+    this.jp.apply(this.target, this.lastPath, fn);
     return this;
   }
 }

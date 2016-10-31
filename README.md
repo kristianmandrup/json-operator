@@ -15,9 +15,16 @@ Uses [jsonpath](https://github.com/kristianmandrup/jsonpath) with new `delete` o
 - setters/getters
   - `.path` : default operator path
   - `.target` : target object
-  - `.result` : get modified target object
   - `.jp` : jsonpath engine
   - `.createMerge` : `function(opts)`
+
+getters
+  - `.history` : history list of `path` and `operation` made
+  - `.result` : modified target object
+  - `.lastPath` : last path mutation applied
+
+setters
+  - `withSame` : use `lastPath` as `withPath` for the following operations
 
 `createMerge` can be set to factory function which returns custom `merge` function used by `merge` if present.
 The `opts` will be the options passed to `merge` enriched with `targetObj` and `mergeObj`
@@ -29,6 +36,8 @@ Note that `indent`, `path` and `opts` are optional.
 - `query(path)` : get all match results in list
 - `value(path)` : get first match result
 - `parent(path)` : parent of first match
+- `with(path)` : set `withPath` used as priority for the following operations (ie. operation scope)
+- `done()` reset `withPath`
 
 *Mutations (via apply)*
 
@@ -40,13 +49,23 @@ Note that `indent`, `path` and `opts` are optional.
 - `reverseMerge(obj, opts)` : merge matches with new object
 - `apply(fn, path)` : apply/execute function on all path matches (delegates to `jsonpath` function `apply`)
 
-All mutations can be chained, f.ex:
+All mutations and mutation related methods can be chained beautifully:
 
 ```js
 let finalResult = operator
-  .delete(delPath)
+  .delete(delPath.x)
   .merge(obj, mergePaths.a)
-  .merge(otherObj, mergePaths.b)
+  .withSame
+    .overwrite({x: 2})
+    .merge(partials[0], mergePaths.b)
+    .and
+    .with(specialPath)
+      .merge(partials[1])
+        .with(sweetPath)
+        .merge(partials[2])
+        .done() // close inner scope
+    .done() // close outer scope
+  .done()
   .result;
 ```
 
