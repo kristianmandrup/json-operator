@@ -1,5 +1,13 @@
 ## Changelog
 
+### 1.1.1
+
+Added chaining on mutator operations :)
+
+### 1.1.0
+
+Added `.result` and improved docs. Improved `delete`
+
 ### 1.0.1
 
   API changes:

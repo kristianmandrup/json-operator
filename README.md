@@ -29,6 +29,9 @@ Note that `indent`, `path` and `opts` are optional.
 - `query(path)` : get all match results in list
 - `value(path)` : get first match result
 - `parent(path)` : parent of first match
+
+*Mutations (via apply)*
+
 - `delete(path)` : delete matches
 - `deleteListItem(removeObj, path)` : delete matches from Array parent
 - `overwrite(obj, path)` : set matched object(s) to new object
@@ -36,6 +39,16 @@ Note that `indent`, `path` and `opts` are optional.
 - `deepMerge(obj, opts)` : deep merge matches with new object 
 - `reverseMerge(obj, opts)` : merge matches with new object
 - `apply(fn, path)` : apply/execute function on all path matches (delegates to `jsonpath` function `apply`)
+
+All mutations can be chained, f.ex:
+
+```js
+let finalResult = operator
+  .delete(delPath)
+  .merge(obj, mergePaths.a)
+  .merge(otherObj, mergePaths.b)
+  .result;
+```
 
 For `delete` and `deleteListItem` you can pass a special `removeObj` when deleting from a parent `Array` node.
 

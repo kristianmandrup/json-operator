@@ -57,7 +57,7 @@ module.exports = class JsonOperator {
   // - https://github.com/kristianmandrup/jsonpath/blob/master/test/sugar.js#L69
 
   delete(path, removeObj) {
-    this.apply((value) => {
+    return this.apply((value) => {
 
       // TODO: refactor
       if (removeObj && isObject(removeObj)) {
@@ -85,25 +85,25 @@ module.exports = class JsonOperator {
   }
 
   deleteItem(removeObj, path) {
-    this.delete(path, removeObj)
+    return this.delete(path, removeObj)
   }
 
   overwrite(obj, path) {
-    this.apply((value) => {
+    return this.apply((value) => {
       return obj;
     }, path)
   }
 
   deepMerge(obj, opts = {}) {
     opts.deep = true
-    this.merge(obj, opts)
+    return this.merge(obj, opts)
   }
 
   merge(obj, opts = {}) {
     let mergeOp;
     mergeOp = mergeOp || (opts || opts.type == 'deep' || opts.deep) ? this.mergeOp : Object.assign;
 
-    this.apply((value) => {
+    return this.apply((value) => {
       if (this.createMerge) {
         opts.mergeObj = obj;
         opts.targetObj = value;
@@ -115,10 +115,11 @@ module.exports = class JsonOperator {
   }
 
   reverseMerge(obj, path) {
-    this.merge(obj, { reverse: true, path: path })
+    return this.merge(obj, { reverse: true, path: path })
   }
 
   apply(fn, path) {
-    return this.jp.apply(this.target, path || this.path, fn);
+    this.jp.apply(this.target, path || this.path, fn);
+    return this;
   }
 }
