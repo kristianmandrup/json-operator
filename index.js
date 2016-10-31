@@ -17,11 +17,13 @@ function isObject(obj) {
 }
 
 module.exports = class JsonOperator {
-  constructor(target, path, altJp) {
+  constructor(target, opts = {}) {
+    const { path, jsonpath, mergeFun, createMerge } = opts;
     this.target = target;
     this.path = path;
-    this.jp = jp || altJp;
-    this.mergeOp = merge; // by default use lodash merge
+    this.jp = jsonpath || jp;
+    this.createMerge = createMerge;
+    this.mergeOp = mergeFun || merge; // by default use lodash merge
   }
 
   get result() {

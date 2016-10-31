@@ -10,7 +10,7 @@ Uses [jsonpath](https://github.com/kristianmandrup/jsonpath) with new `delete` o
 
 ## API
 
-- constructor(target, path, jp)
+- `constructor(target, {path, jsonpath, mergeFun, createMerge})`
 
 - setters/getters
   - `.path` : default operator path
@@ -119,6 +119,7 @@ We perform the following operations to:
 Full API example
 
 ```js
+const store = require('./store')
 const operator = new JsonOperator(store)
 
 let paths = {
