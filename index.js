@@ -82,6 +82,25 @@ module.exports = class JsonOperator {
   // - https://github.com/kristianmandrup/jsonpath/blob/master/test/sugar.js#L43
   // - https://github.com/kristianmandrup/jsonpath/blob/master/test/sugar.js#L69
 
+
+  insert(insertObj, path) {
+    return this.apply((value) => {
+      if (Array.isArray(value) && insertObj) {
+        value.push(insertObj);
+      }
+      return value;
+    }, path, 'insert')
+  }
+
+  insertAt(insertObj, key, path) {
+    return this.apply((value) => {
+      if (isObject(value) && insertObj && key) {
+        value[key] = insertObj;
+      }
+      return value;
+    }, path, 'insertAt')
+  }
+
   delete(path, removeObj, operation) {
     return this.apply((value) => {
 

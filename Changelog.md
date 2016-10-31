@@ -1,5 +1,9 @@
 ## Changelog
 
+### 1.2.1
+
+- Introduce `insert` and `insertAt` to inser objects :)
+
 ### 1.2.0
 
 - Introduce `and` getter as alias for `withSame`

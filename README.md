@@ -41,6 +41,8 @@ Note that `indent`, `path` and `opts` are optional.
 
 *Mutations (via apply)*
 
+- `insert(insertObj)` : insert object in Array
+- `insertAt(insertObj, key)` : insert object at key on target object
 - `delete(path)` : delete matches
 - `deleteListItem(removeObj, path)` : delete matches from Array parent
 - `overwrite(obj, path)` : set matched object(s) to new object
