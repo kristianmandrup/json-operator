@@ -13,7 +13,11 @@ Perform efficient path based operations on JSON Objects (or most Javascript data
 - setters/getters 
   - .path : default operator path
   - .target : target object
-  - .jp : jsonpath engine      
+  - .jp : jsonpath engine
+  - .createMerge : function(opts)
+
+`createMerge` can be set to factory function which returns custom `merge` function used by `merge` if present.
+The `opts` will be the options passed to `merge` enriched with `targetObj` and `mergeObj`
 
 Note that `indent`, `path` and `opts` are optional. 
 
@@ -25,8 +29,9 @@ Note that `indent`, `path` and `opts` are optional.
 - delete(path) : delete all matches
 - set(obj, path) : set matches to new object
 - merge(obj, opts) : merge matches with new object
+- deepMerge(obj, opts) : deep merge matches with new object 
 - reverseMerge(obj, opts) : merge matches with new object
-
+- apply(fn, path) : apply function on all path matches (delegates to `jsonpath` function `apply`)
 
 ## Usage
 
@@ -124,7 +129,7 @@ console.log('book 3 set', book3Set)
 console.log('book 3 set', book3Merged)
 
 // operator.merge({price: 100}, {reverse: true})
-operator.merge({rating: 4}, {reverse: true, path: mergePath})
+operator.deepMerge({rating: 4}, {reverse: true, path: mergePath})
 operator.reverseMerge({rating: 4})
 operator.reverseMerge({rating: 4}, path)
 
@@ -132,9 +137,38 @@ operator.delete()
 let book3deleted = operator.value()
 console.log('book 3 deleted', book3deleted)
 console.log('store after all operations', operator.targetAsStr())
+
+// return merge function dependent on option .admin setting
+operator.createMerge = (opts) => {
+  return (opts.admin) ? fullMerge : partialMerge; 
+}
+
+// do full merge
+operator.merge({admin: true})
+
+// return merge function dependent on whether role of target object (a User) is 'admin' 
+operator.createMerge = (opts) => {
+  return (opts.targetObj.role === 'admin') ? fullMerge : partialMerge; 
+}
+
+operator.target = {
+  name: 'kris',
+  role: 'admin'
+}
+
+// do full merge
+operator.merge();
+
+operator.target = {
+  name: 'sandy',
+  role: 'guest'
+}
+
+// do partial merge
+operator.merge();
 ```
 
-The example can be found in `/examples/demo.js` in the repo. 
+The example demo (excluding use of `createMerge`) can be found in `/examples/demo.js` in the repo. 
 
 ## Set alternative jsonpath engine
 

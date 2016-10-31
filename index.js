@@ -17,6 +17,7 @@ module.exports = class JsonOperator {
     this.target = target;
     this.path = path;
     this.jp = jp || altJp;
+    this.mergeOp = merge; // by default use lodash merge
   }
   
   targetAsStr(indent = 2) {
@@ -45,15 +46,29 @@ module.exports = class JsonOperator {
     }, path)    
   }
 
-  set(obj, path) {    
+  overwrite(obj, path) {    
     this.apply((value) => {
       return obj;
     }, path)    
   }
 
+  deepMerge(obj, opts = {}) {
+    opts.deep = true
+    this.merge(obj, opts)
+  }
+
   merge(obj, opts = {}) {
+    let mergeOp;      
+    mergeOp = mergeOp || (opts || opts.type == 'deep' || opts.deep) ? this.mergeOp : Object.assign;  
+
     this.apply((value) => {
-      return opts.reverse ? merge({}, obj, value) : merge({}, value, obj);
+      if (this.createMerge) {
+        opts.mergeObj = obj;
+        opts.targetObj = value;
+        mergeOp = this.createMerge(opts);
+      }
+
+      return opts.reverse ? mergeOp({}, obj, value) : mergeOp({}, value, obj);
     }, extractPath(opts))    
   }
 

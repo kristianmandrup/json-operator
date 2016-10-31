@@ -27,7 +27,7 @@ console.log('original book 3', book3)
 operator.path = paths.book3;
 
 // overwrite book3 with book2
-operator.set(book2val)
+operator.overwrite(book2val)
 let book3Set = operator.value(); 
 
 console.log('original book 3', book3)

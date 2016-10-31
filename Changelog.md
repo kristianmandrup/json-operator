@@ -3,6 +3,16 @@
 ### 1.0.1
 
   API changes:
+  - changed `set` to `overwrite` to make it more clear and not conflict with built in `set` method
+  - allow override of `mergeOp`
+  - allow calling `merge` with `{type: 'deep}` otherwise using shallow merge  
+  - add `deepMerge` convenience method
+  - add optional `createMerge` factory function, that can be used to return custom merge function given options (and obj)
+  - add `createMerge` examples
+
+### 1.0.1
+
+  API changes:
   - Changed `get` to `query`
   - Added `targetAsStr` and `display` methods
   - Added option to set alternative `jsonpath` engine 
@@ -21,6 +31,7 @@
     - set(obj, path) : set matches to new object
     - merge(obj, opts) : merge matches with new object
     - reverseMerge(obj, opts) : merge matches with new object
+    - apply(fn, path) : apply function matches
 
 ### 1.0.0
   - initial version
