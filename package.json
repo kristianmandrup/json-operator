@@ -1,0 +1,40 @@
+{
+  "name": "json-operator",
+  "version": "1.0.0",
+  "description": "JSON operator for delete, set and merge using jsonpath",
+  "homepage": "https://github.com/kristianmandrup/json-operator",
+  "author": {
+    "name": "Kristian Mandrup",
+    "email": "kmandrup@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kristianmandrup/json-operator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kristianmandrup/json-operator/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/kristianmandrup/json-operator/blob/master/LICENSE"
+    }
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": ">= 6.0.0",
+    "npm": ">=3.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "json",
+    "operator",
+    "jsonpath"
+  ],
+  "dependencies": {
+    "jsonpath": "^0.2.7",
+    "lodash.merge": "^4.6.0"
+  }
+}
