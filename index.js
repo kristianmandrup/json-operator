@@ -24,6 +24,10 @@ module.exports = class JsonOperator {
     this.mergeOp = merge; // by default use lodash merge
   }
 
+  get result() {
+    return this.target;
+  }
+
   targetAsStr(indent = 2) {
     return JSON.stringify(this.target, null, indent);
   }

@@ -15,6 +15,7 @@ Uses [jsonpath](https://github.com/kristianmandrup/jsonpath) with new `delete` o
 - setters/getters
   - `.path` : default operator path
   - `.target` : target object
+  - `.result` : get modified target object
   - `.jp` : jsonpath engine
   - `.createMerge` : `function(opts)`
 
@@ -30,8 +31,8 @@ Note that `indent`, `path` and `opts` are optional.
 - `parent(path)` : parent of first match
 - `delete(path)` : delete matches
 - `deleteListItem(removeObj, path)` : delete matches from Array parent
-- `set(obj, path)` : set matches to new object
-- `merge(obj, opts)` : merge matches with new object
+- `overwrite(obj, path)` : set matched object(s) to new object
+- `merge(obj, opts)` : merge matched ojbect(s) with new object
 - `deepMerge(obj, opts)` : deep merge matches with new object 
 - `reverseMerge(obj, opts)` : merge matches with new object
 - `apply(fn, path)` : apply/execute function on all path matches (delegates to `jsonpath` function `apply`)
@@ -207,6 +208,82 @@ You can now also set an alternative `jsonpath` engine.
 ```js
 const fastpath = require('fastpath');
 operator.jp = fastpath;
+```
+
+## Advanced usage
+
+- [through2](https://github.com/rvagg/through2)
+- [stream-handbook](https://github.com/substack/stream-handbook)
+
+Example:
+
+```js
+var all = []
+
+fs.createReadStream('./data.json')
+  .pipe(split())
+  .pipe(through2.obj(function (obj, enc, callback) {
+    const operator = new JsonOperator(obj)
+    // some JSON operations
+    // ...
+    let data = operator.result;
+    this.push(data)
+    callback()
+  }))
+  .on('data', function (data) {
+    all.push(data)
+  })
+  .on('end', function () {
+    doSomethingSpecial(all)
+  })
+```
+
+To operate efficiently on a folder with `json` file perhaps use [readdirp](https://github.com/thlorenz/readdirp) to read directory as a stream.
+See next example for inspiration.
+
+### Mongoose streaming example
+
+[querystream](http://mongoosejs.com/docs/2.7.x/docs/querystream.html)
+
+```js
+const paths = {
+  // ...
+  userRole: '$.user.role'
+};
+
+const jsonTransformStream = new JsonTransformStream({ paths });
+
+Model.find().stream().pipe(jsonTransformStream).pipe(ctx.body);
+```
+
+```
+const Transform = require('stream').Transform
+
+module.exports = class JsonTransformStream extends Transform {
+  constructor(options = {}) {
+    this.operator = new JsonOperator();
+    this.paths = options.paths;
+    this.objs = options.objs;
+  }
+
+  // do some user role operations!
+  operateOn(obj) {
+    this.operator.target = chunk;
+    if (obj.user) {
+      this.operator.merge(this.objs.role, this.paths.userRole)
+    }
+    this.push(this.operator.result);
+  }
+
+  _transform(chunk, encoding, done) {
+    this.operateOn(chunk)
+    done();
+  }
+
+  _flush(done) {
+      done();
+  }
+}
 ```
 
 ## Alternatives
