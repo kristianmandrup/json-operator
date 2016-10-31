@@ -6,6 +6,28 @@ Perform efficient path based operations on JSON Objects (or most Javascript data
 
 `npm i json-operator --save`
 
+## API
+
+- constructor(target, path, jp)
+
+- setters/getters 
+  - .path : default operator path
+  - .target : target object
+  - .jp : jsonpath engine      
+
+Note that `indent`, `path` and `opts` are optional. 
+
+- targetAsStr(indent = 2) : get prettified string of target obj
+- display(indent, logger) : display prettified string of target obj using logger (default console.log) 
+- query(path) : get all match results in list
+- value(path) : get first match result
+- parent(path) : parent of first match
+- delete(path) : delete all matches
+- set(obj, path) : set matches to new object
+- merge(obj, opts) : merge matches with new object
+- reverseMerge(obj, opts) : merge matches with new object
+
+
 ## Usage
 
 Given the following book store:
@@ -68,16 +90,19 @@ let paths = {
   book3: '$..book[3]'
 }
 
-let book2 = operator.get(paths.book2);
-console.log('original book 2', book2)
+// query for all matching path
+let book2results = operator.query(paths.book2);
+console.log('original book 2', book2results)
 
+// get the first match for book 2
 let book2val = operator.value(paths.book2);
 console.log('original book 2 value', book2val)
 
 // let book2par = operator.parent(paths.book2);
 // console.log('original book 2 parent', book2par)
 
-let book3 = operator.get(paths.book3);
+// get the first match for book 3 
+let book3 = operator.value(paths.book3);
 console.log('original book 3', book3)
 
 // set default path to use for the following ops
@@ -111,14 +136,34 @@ console.log('store after all operations', operator.targetAsStr())
 
 The example can be found in `/examples/demo.js` in the repo. 
 
-## Alternative
+## Set alternative jsonpath engine
 
-Some of the jsonpath alternative transformers
+You can now also set an alternative `jsonpath` engine.
+
+```js
+const fastpath = require('fastpath');
+operator.jp = fastpath;
+``` 
+
+## Alternatives
+
+Some alternative `jsonpath` transformers
 
 - [jsonpath-plus](https://www.npmjs.com/package/jsonpath-plus)
 - [jsonpath-transform](https://www.npmjs.com/package/jsonpath-transform)
+- [jsonpath-object-transform](https://www.npmjs.com/package/jsonpath-object-transform)
+- [jsonpath-rep](https://www.npmjs.com/package/jsonpath-rep) with replacement
 
 Would be nice if we could combine the best of all ;)
+
+## JSON path alternative
+
+- [jsonave](https://www.npmjs.com/package/jsonave)
+- [fastpath](https://www.npmjs.com/package/fastpath)
+
+## Misc
+
+- [jsonpath-to-dot](https://www.npmjs.com/package/jsonpath-to-dot)
 
 ## Licences
 

@@ -13,11 +13,12 @@ function extractPath(opts) {
 }
 
 module.exports = class JsonOperator {
-  constructor(target, path) {
+  constructor(target, path, altJp) {
     this.target = target;
-    this.path = path; 
+    this.path = path;
+    this.jp = jp || altJp;
   }
-
+  
   targetAsStr(indent = 2) {
     return JSON.stringify(this.target, null, indent);
   }
@@ -26,17 +27,16 @@ module.exports = class JsonOperator {
     logger(this.targetAsStr(indent))
   }
 
-  get(path) {
-    console.log('get', path || this.path)
-    return jp.query(this.target, path || this.path);
+  query(path) {
+    return this.jp.query(this.target, path || this.path);
   }
 
   value(path) {
-    return jp.value(this.target, path || this.path);
+    return this.jp.value(this.target, path || this.path);
   }
 
   parent(path) {
-    return jp.parent(this.target, path || this.path);
+    return this.jp.parent(this.target, path || this.path);
   }
 
   delete(path) {
@@ -62,6 +62,6 @@ module.exports = class JsonOperator {
   }
 
   apply(fn, path) {    
-    return jp.apply(this.target, path || this.path, fn);    
+    return this.jp.apply(this.target, path || this.path, fn);    
   }
 }

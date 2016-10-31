@@ -9,16 +9,18 @@ let paths = {
   book3: '$..book[3]'
 }
 
-let book2 = operator.get(paths.book2);
+let book2 = operator.query(paths.book2);
 console.log('original book 2', book2)
 
+// get the first match for book 2
 let book2val = operator.value(paths.book2);
 console.log('original book 2 value', book2val)
 
 // let book2par = operator.parent(paths.book2);
 // console.log('original book 2 parent', book2par)
 
-let book3 = operator.get(paths.book3);
+// get the first match for book 3
+let book3 = operator.value(paths.book3);
 console.log('original book 3', book3)
 
 // set default path to use for the following ops
