@@ -13,30 +13,30 @@ Uses [jsonpath](https://github.com/kristianmandrup/jsonpath) with new `delete` o
 - constructor(target, path, jp)
 
 - setters/getters
-  - .path : default operator path
-  - .target : target object
-  - .jp : jsonpath engine
-  - .createMerge : function(opts)
+  - `.path` : default operator path
+  - `.target` : target object
+  - `.jp` : jsonpath engine
+  - `.createMerge` : `function(opts)`
 
 `createMerge` can be set to factory function which returns custom `merge` function used by `merge` if present.
 The `opts` will be the options passed to `merge` enriched with `targetObj` and `mergeObj`
 
 Note that `indent`, `path` and `opts` are optional. 
 
-- targetAsStr(indent = 2) : get prettified string of target obj
-- display(indent, logger) : display prettified string of target obj using logger (default console.log) 
-- query(path) : get all match results in list
-- value(path) : get first match result
-- parent(path) : parent of first match
-- delete(path) : delete matches
-- deleteListItem(removeObj, path) : delete matches from Array parent
-- set(obj, path) : set matches to new object
-- merge(obj, opts) : merge matches with new object
-- deepMerge(obj, opts) : deep merge matches with new object 
-- reverseMerge(obj, opts) : merge matches with new object
-- apply(fn, path) : apply function on all path matches (delegates to `jsonpath` function `apply`)
+- `targetAsStr(indent = 2)` : get prettified string of target obj
+- `display(indent, logger)` : display prettified string of target obj using logger (default `console.log`) 
+- `query(path)` : get all match results in list
+- `value(path)` : get first match result
+- `parent(path)` : parent of first match
+- `delete(path)` : delete matches
+- `deleteListItem(removeObj, path)` : delete matches from Array parent
+- `set(obj, path)` : set matches to new object
+- `merge(obj, opts)` : merge matches with new object
+- `deepMerge(obj, opts)` : deep merge matches with new object 
+- `reverseMerge(obj, opts)` : merge matches with new object
+- `apply(fn, path)` : apply/execute function on all path matches (delegates to `jsonpath` function `apply`)
 
-For `delete` and `deleteListItem` you can pass a special `removeObj` when deleting from a parent Array node.
+For `delete` and `deleteListItem` you can pass a special `removeObj` when deleting from a parent `Array` node.
 
 For common cases when removing by an identity key:
 
@@ -48,7 +48,7 @@ For common cases when removing by an identity key:
 }
 ```
 
-Or even more convenient
+Even more conveniently:
 
 ```js
 {
@@ -56,13 +56,12 @@ Or even more convenient
 }
 ```
 
-
-You can create custom remove functionality with apply as demonstrated here:
+You can also create more advanced `remove` functionality with `apply` as demonstrated here:
 
 - [remove obj example](https://github.com/kristianmandrup/jsonpath/blob/master/test/sugar.js#L69)
 - [remove function example](https://github.com/kristianmandrup/jsonpath/blob/master/test/sugar.js#L42)
 
-Then add your custom delete function to the operator object or the class `.prototype`.
+Then add your custom delete functions to the `operator` object or the class `JsonOperator.prototype`.
 
 ## Usage
 
@@ -177,7 +176,7 @@ operator.createMerge = (opts) => {
 // do full merge
 operator.merge({admin: true})
 
-// return merge function dependent on whether role of target object (a User) is 'admin' 
+// return merge function dependent on whether role of target object (a User) is 'admin'
 operator.createMerge = (opts) => {
   return (opts.targetObj.role === 'admin') ? fullMerge : partialMerge; 
 }
@@ -208,7 +207,7 @@ You can now also set an alternative `jsonpath` engine.
 ```js
 const fastpath = require('fastpath');
 operator.jp = fastpath;
-``` 
+```
 
 ## Alternatives
 
@@ -232,6 +231,6 @@ Would be nice if we could combine the best of all ;)
 
 ## Licences
 
-MIT 
+MIT
 
 Kristian Mandrup <kmandrup@gmail.com> 2016
