@@ -10,93 +10,94 @@ Uses [jsonpath](https://github.com/kristianmandrup/jsonpath) with new `delete` o
 
 ## API
 
+Note: The arguments `indent`, `path` and `opts` are always optional. 
+
+### Constructor
+
 - `constructor(target, {path, jsonpath, mergeFun, createMerge})`
 
-- setters/getters
+### Setters and getters
   - `.path` : default operator path
   - `.target` : target object
   - `.jp` : jsonpath engine
   - `.createMerge` : `function(opts)`
 
-getters
+`createMerge` can be set to factory function which returns custom `merge` function used by `merge` if present. The `opts` will be the options passed to `merge` enriched with `targetObj` and `mergeObj`
+
+### Getters
   - `.history` : history list of `path` and `operation` made
   - `.result` : modified target object
   - `.lastPath` : last path mutation applied
 
-setters
-  - `withSame` : use `lastPath` as `withPath` for the following operations
-
-`createMerge` can be set to factory function which returns custom `merge` function used by `merge` if present.
-The `opts` will be the options passed to `merge` enriched with `targetObj` and `mergeObj`
-
-Note that `indent`, `path` and `opts` are optional. 
-
+### Display
 - `targetAsStr(indent = 2)` : get prettified string of target obj
 - `display(indent, logger)` : display prettified string of target obj using logger (default `console.log`) 
+
+### Read values
 - `query(path)` : get all match results in list
 - `value(path)` : get first match result
 - `parent(path)` : parent of first match
-- `with(path)` : set `withPath` used as priority for the following operations (ie. operation scope)
-- `done()` reset `withPath`
 
-*Mutations (via apply)*
+### Path operation scope*
+- `with(path)` : set `withPath` used in new operations scope
+- `withSame()` : use `lastPath` as `withPath` in new operations scope
+- `and()` : alias to `withSame`
+- `done()` : exit current operation scope
 
-- `insert(insertObj)` : insert object in Array
+## Mutations
+
+`opts` is an optional argument which may contain:
+- `path` : to override current scope path
+- `condition` : function to be called with node `value` and `context` (ie. `parent` and `key`) to decide if mutation/action should be performed.
+
+This `condition` function has the signature:
+
+`function(value, {parent, key}) : boolean`
+
+### Insert
+- `push(insertObj, opts = {})` : insert object into parent Array
+- `insertBefore(insertObj, opts = {})` : insert object before matching node
+- `insertAfter(insertObj, opts = {})` : insert object before matching node
 - `insertAt(insertObj, key)` : insert object at key on target object
-- `delete(path)` : delete matches
-- `deleteListItem(removeObj, path)` : delete matches from Array parent
-- `overwrite(obj, path)` : set matched object(s) to new object
-- `merge(obj, opts)` : merge matched ojbect(s) with new object
-- `deepMerge(obj, opts)` : deep merge matches with new object 
-- `reverseMerge(obj, opts)` : merge matches with new object
-- `apply(fn, path)` : apply/execute function on all path matches (delegates to `jsonpath` function `apply`)
 
-All mutations and mutation related methods can be chained beautifully:
+### Delete
+- `delete(opts = {})` : delete matches
+
+### Set
+- `overwrite(obj, opts = {})` : set match to new object
+
+### Merge
+- `merge(obj, opts = {})` : merge matches with new object
+- `deepMerge(obj, opts = {})` : deep merge matches with new object
+- `reverseMerge(obj, opts = {})` : merge matches with new object
+
+### Delegation (general purpose)
+- `apply(fn, path)` : delegates to `jsonpath.apply`
+- `filter(fn, path)` : delegates to `jsonpath.filter`
+
+*All mutators can be chained beautifully :)*
 
 ```js
 let finalResult = operator
-  .delete(delPath.x)
-  .merge(obj, mergePaths.a)
-  .withSame
-    .overwrite({x: 2})
-    .merge(partials[0], mergePaths.b)
-    .and
-    .with(specialPath)
-      .merge(partials[1])
-        .with(sweetPath)
-        .merge(partials[2])
-        .done() // close inner scope
-    .done() // close outer scope
+  .delete({path: delPath.x})
+  .merge(obj, {path: mergePaths.a, condition: mySpecialCondition})
+  .withSame() // use latest path for new scope
+    .overwrite({x: 2}) // overwrite using latest scope path
+    .merge(partials[0], {path: mergePaths.b}) // merge using custom path
+    .and() // use latest path for new scope
+      .merge(objX) // reusing latest path
+      .with(specialPath) // create scope with path
+        .merge(partials[1]) // merge using scope path
+        .with(sweetPath) // create inner scope path
+          .merge(partials[2]) // merge using current scope path
+        .done() // close current scope
+      .done()
+    .done()
   .done()
   .result;
 ```
 
-For `delete` and `deleteListItem` you can pass a special `removeObj` when deleting from a parent `Array` node.
-
-For common cases when removing by an identity key:
-
-```js
-{
-  removeItem: {
-    key: 'id'
-  }
-}
-```
-
-Even more conveniently:
-
-```js
-{
-  removeItemMatching: 'id'
-}
-```
-
-You can also create more advanced `remove` functionality with `apply` as demonstrated here:
-
-- [remove obj example](https://github.com/kristianmandrup/jsonpath/blob/master/test/sugar.js#L69)
-- [remove function example](https://github.com/kristianmandrup/jsonpath/blob/master/test/sugar.js#L42)
-
-Then add your custom delete functions to the `operator` object or the class `JsonOperator.prototype`.
+You can add your custom functions directly to the `operator` object or the class `JsonOperator.prototype`.
 
 ## Usage
 
@@ -197,13 +198,19 @@ console.log('book 3 set', book3Merged)
 // operator.merge({price: 100}, {reverse: true})
 operator.deepMerge({rating: 4}, {reverse: true, path: mergePath})
 operator.reverseMerge({rating: 4})
-operator.reverseMerge({rating: 4}, path)
+operator.reverseMerge({rating: 4}, {path})
 
 operator.delete()
 let book3deleted = operator.value()
 console.log('book 3 deleted', book3deleted)
 console.log('store after all operations', operator.targetAsStr())
+```
 
+### Custom merge
+
+You can define a custom merge function as follows:
+
+```js
 // return merge function dependent on option .admin setting
 operator.createMerge = (opts) => {
   return (opts.admin) ? fullMerge : partialMerge; 
@@ -243,6 +250,12 @@ You can now also set an alternative `jsonpath` engine.
 ```js
 const fastpath = require('fastpath');
 operator.jp = fastpath;
+```
+
+Note: Some `jsonpath` alternatives don't yet have a `filter` function (for `delete`) and be fully compatible. You might however be able to add `filter` (and `apply`) from jsonpath?
+
+```js
+fastpath.filter = jsonpath.prototype.filter;
 ```
 
 ## Advanced usage
@@ -305,7 +318,7 @@ module.exports = class JsonTransformStream extends Transform {
   operateOn(obj) {
     this.operator.target = chunk;
     if (obj.user) {
-      this.operator.merge(this.objs.role, this.paths.userRole)
+      this.operator.merge(this.objs.role, {path: this.paths.userRole})
     }
     this.push(this.operator.result);
   }

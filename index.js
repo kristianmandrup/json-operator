@@ -1,17 +1,6 @@
 const jp = require('jsonpath');
 const merge = require('lodash.merge');
 
-function extractPath(opts) {
-  switch (typeof opts) {
-    case 'string':
-      return opts
-    case 'object':
-      return opts.path
-    default:
-      return undefined
-  }
-}
-
 function isObject(obj) {
   return obj === Object(obj);
 }
@@ -56,7 +45,10 @@ module.exports = class JsonOperator {
   }
 
   with(path) {
-    this.withPaths.push(path);
+    // only create new scope if new path
+    if (path !== this.withPaths[this.withPaths.length]) {
+      this.withPaths.push(path);
+    }
     return this;
   }
 
@@ -83,17 +75,58 @@ module.exports = class JsonOperator {
   // - https://github.com/kristianmandrup/jsonpath/blob/master/test/sugar.js#L69
 
 
-  insert(insertObj, path) {
-    return this.apply((value) => {
-      if (Array.isArray(value) && insertObj) {
-        value.push(insertObj);
+  push(insertObj, opts = {}) {
+    var { path, condition } = opts;
+    return this.apply((value, ctx) => {
+      if (condition && !condition(value, ctx)) {
+        return value;
+      }
+
+      let parent = ctx.parent;
+      if (Array.isArray(parent) && insertObj) {
+        parent.push(insertObj);
       }
       return value;
     }, path, 'insert')
   }
 
-  insertAt(insertObj, key, path) {
-    return this.apply((value) => {
+  insertBefore(insertObj, path, opts = {}) {
+    var { path, condition } = opts;
+    return this.apply((value, ctx) => {
+      if (condition && !condition(value, ctx)) {
+        return value;
+      }
+
+      let parent = ctx.parent;
+      if (Array.isArray(parent) && insertObj) {
+        parent.splice(ctx.key, 0, insertObj);
+      }
+      return value;
+    }, path, 'insert')
+  }
+
+  insertAfter(insertObj, path, opts = {}) {
+    var { path, condition } = opts;
+    return this.apply((value, ctx) => {
+      if (condition && !condition(value, ctx)) {
+        return value;
+      }
+
+      let parent = ctx.parent;
+      if (Array.isArray(parent) && insertObj) {
+        parent.splice(ctx.key + 1, 0, insertObj);
+      }
+      return value;
+    }, path, 'insert')
+  }
+
+  insertAt(insertObj, key, opts = {}) {
+    var { path, condition } = opts;
+    return this.apply((value, ctx) => {
+      if (condition && !condition(value, ctx)) {
+        return value;
+      }
+
       if (isObject(value) && insertObj && key) {
         value[key] = insertObj;
       }
@@ -101,40 +134,23 @@ module.exports = class JsonOperator {
     }, path, 'insertAt')
   }
 
-  delete(path, removeObj, operation) {
-    return this.apply((value) => {
-
-      // TODO: refactor
-      if (removeObj && isObject(removeObj)) {
-        if (!isObject(removeObj.removeItem)) {
-          var key = removeObj.removeItem || removeObj.removeItemMatching;
-          if (key) {
-            removeObj = {
-              removeItem: {
-                id: String(key)
-              }
-            }
-          }
-        }
-
-        if (removeObj.removeItem) {
-          removeObj.removeItem.match = value;
-        }
+  delete(opts = {}) {
+    var { path, condition } = opts;
+    return this.filter((value, ctx) => {
+      if (condition) {
+        return condition(value, ctx)
       }
-      if (!removeObj || !removeObj.removeItem) {
-        removeObj = null;
-      }
-
-      return removeObj || ':delete:';
-    }, path, operation || 'delete')
+      // by default always delete it
+      return true;
+    }, path, 'delete')
   }
 
-  deleteItem(removeObj, path) {
-    return this.delete(path, removeObj, 'deleteItem')
-  }
-
-  overwrite(obj, path) {
-    return this.apply((value) => {
+  overwrite(obj, opts = {}) {
+    var { path, condition } = opts;
+    return this.apply((value, ctx) => {
+      if (condition) {
+        return condition(value, ctx) ? obj : value;
+      }
       return obj;
     }, path, 'overwrite')
   }
@@ -145,10 +161,15 @@ module.exports = class JsonOperator {
   }
 
   merge(obj, opts = {}, operation) {
+    var { path, condition } = opts;
     let mergeOp;
     mergeOp = mergeOp || (opts || opts.type == 'deep' || opts.deep) ? this.mergeOp : Object.assign;
 
-    return this.apply((value) => {
+    return this.apply((value, ctx) => {
+      if (condition && !condition(value, ctx)) {
+        return value;
+      }
+
       if (this.createMerge) {
         opts.mergeObj = obj;
         opts.targetObj = value;
@@ -156,14 +177,23 @@ module.exports = class JsonOperator {
       }
 
       return opts.reverse ? mergeOp({}, obj, value) : mergeOp({}, value, obj);
-    }, extractPath(opts), operation || 'merge')
+    }, path, operation || 'merge')
   }
 
   reverseMerge(obj, path) {
     return this.merge(obj, { reverse: true, path: path }, 'reverseMerge')
   }
 
+  filter(fn, path, operation) {
+    return this._run('filter', fn, path, operation)
+  }
+
   apply(fn, path, operation) {
+    return this._run('apply', fn, path, operation)
+  }
+
+  // protected
+  _run(jpFun, fn, path, operation) {
     let latestWithPath = this.withPaths[this.withPaths.length];
 
     this.lastPath = path || latestWithPath || this.lastPath || this.path;
@@ -174,7 +204,7 @@ module.exports = class JsonOperator {
       operation: operation
     });
 
-    this.jp.apply(this.target, this.lastPath, fn);
+    this.jp[jpFun](this.target, this.lastPath, fn);
     return this;
   }
 }

@@ -45,7 +45,7 @@ console.log('book 3 merged', book3Merged)
 // operator.merge({price: 100}, {reverse: true})
 // operator.merge({price: 100}, {reverse: true, path: mergePath})
 // operator.reverseMerge({price: 100})
-// operator.reverseMerge({price: 100}, path)
+// operator.reverseMerge({price: 100}, {path})
 
 operator.delete()
 let book3deleted = operator.value()

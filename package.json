@@ -1,6 +1,6 @@
 {
   "name": "json-operator",
-  "version": "1.2.1",
+  "version": "1.2.3",
   "description": "JSON operator for delete, set and merge using jsonpath",
   "homepage": "https://github.com/kristianmandrup/json-operator",
   "author": {
