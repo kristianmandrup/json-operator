@@ -8,6 +8,67 @@ Uses [jsonpath](https://github.com/kristianmandrup/jsonpath) with new `delete` o
 
 `npm i json-operator --save`
 
+## TODO
+
+- Add [normalizr](https://www.npmjs.com/package/normalizr)
+- Add `flatten` function to flatten nested object via flatten condition rule(s)
+
+*Flatten example*
+
+```js
+let obj = {
+  x: {
+    a: {
+      b: [...],
+      c: {
+        name: 'hello'
+        ...
+      }
+    }
+  }
+  y: []
+  v: 'hello
+}
+
+// 
+let keepOrFlat = function(node) {
+  if (node.name && typeof node.name === 'string') return true
+  if (Array,isArray(node)) return true
+  if (typeof node === 'object') return false
+  return true
+}
+
+let flatten = function(node) {
+  if (typeof node !== 'object') return false  
+  if (node.name) return false
+  return true
+}
+
+let keep = function(node) {
+  if (typeof node !== 'object') return true  
+  if (node.name && typeof node.name === 'string') return true
+}
+
+// if keepOrFlat is set, other condition functions are ignored
+let conditions = {
+  keepOrFlat, 
+  flatten, 
+  keep 
+}
+
+let flatObj = obj.flatten({sep: '.', conditions: })
+
+let obj = {
+  'x.a.b': [...],
+  'x.a.c': {
+    name: 'hello'
+    ...
+  }
+  y: []
+  v: 'hello
+}
+```
+
 ## API
 
 Note: The arguments `indent`, `path` and `opts` are always optional. 
