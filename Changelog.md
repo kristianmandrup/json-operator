@@ -1,5 +1,89 @@
 ## Changelog
 
+### 1.3.1
+
+- Rename `insertBefore` and `insertAfter` to `prepend` and `append`.
+- Rename `push` to `concat` and make it concat
+- Add `splice` method
+
+### 1.3.0
+
+*Add flat and normalize* 
+
+- Added [normalizr](https://www.npmjs.com/package/normalizr)
+- Added `flatten` and `unflatten` functions to flatten nested object via [flat](https://www.npmjs.com/package/flat)
+
+Using my [flat fork](https://github.com/kristianmandrup/flat)
+
+*Flatten example*
+
+```js
+let obj = {
+  x: {
+    a: {
+      b: [{name: hello}]
+      c: {
+        name: 'hello'
+        status: 'done'
+      }
+    }
+  },
+  y: [],
+  v: 'hello'
+}
+
+let flatObj = operator.flatten(flattenOpts)
+
+let obj = {
+  'x.a.b': [...],
+  'x.a.c': {
+    name: 'hello'
+    ...
+  }
+  y: []
+  v: 'hello
+}
+```
+
+*normalize*
+
+```js
+const article = new Schema('articles');
+const user = new Schema('users');
+ 
+article.define({
+  author: user,
+  contributors: arrayOf(user),
+  meta: {
+    likes: arrayOf({
+      user: user
+    })
+  }
+});
+ 
+// ... 
+ 
+// Normalize one article object 
+const json = { id: 1, author: ... };
+const normalized = normalize(json, article);
+ 
+// Normalize an array of article objects 
+const arr = [{ id: 1, author: ... }, ...]
+const normalized = normalize(arr, arrayOf(article));
+
+// with OPERATOR
+
+let result = operator.normalize(
+  arrayOf(article), 
+  normalizeOpts
+).value
+
+```
+
+### 1.2.3
+
+Improve insert functionality
+
 ### 1.2.1
 
 - Introduce `insert` and `insertAt` to inser objects :)

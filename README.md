@@ -8,67 +8,6 @@ Uses [jsonpath](https://github.com/kristianmandrup/jsonpath) with new `delete` o
 
 `npm i json-operator --save`
 
-## TODO
-
-- Add [normalizr](https://www.npmjs.com/package/normalizr)
-- Add `flatten` function to flatten nested object via flatten condition rule(s)
-
-*Flatten example*
-
-```js
-let obj = {
-  x: {
-    a: {
-      b: [...],
-      c: {
-        name: 'hello'
-        ...
-      }
-    }
-  }
-  y: []
-  v: 'hello
-}
-
-// 
-let keepOrFlat = function(node) {
-  if (node.name && typeof node.name === 'string') return true
-  if (Array,isArray(node)) return true
-  if (typeof node === 'object') return false
-  return true
-}
-
-let flatten = function(node) {
-  if (typeof node !== 'object') return false  
-  if (node.name) return false
-  return true
-}
-
-let keep = function(node) {
-  if (typeof node !== 'object') return true  
-  if (node.name && typeof node.name === 'string') return true
-}
-
-// if keepOrFlat is set, other condition functions are ignored
-let conditions = {
-  keepOrFlat, 
-  flatten, 
-  keep 
-}
-
-let flatObj = obj.flatten({sep: '.', conditions: })
-
-let obj = {
-  'x.a.b': [...],
-  'x.a.c': {
-    name: 'hello'
-    ...
-  }
-  y: []
-  v: 'hello
-}
-```
-
 ## API
 
 Note: The arguments `indent`, `path` and `opts` are always optional. 
@@ -116,13 +55,14 @@ This `condition` function has the signature:
 `function(value, {parent, key}) : boolean`
 
 ### Insert
-- `push(insertObj, opts = {})` : insert object into parent Array
-- `insertBefore(insertObj, opts = {})` : insert object before matching node
-- `insertAfter(insertObj, opts = {})` : insert object before matching node
+- `concat(insertObjs, opts = {})` : concatenate object(s) at the end of parent Array
+- `prepend(insertObj, opts = {})` : prepend object before matching node
+- `append(insertObj, opts = {})` : append object after matching node
 - `insertAt(insertObj, key)` : insert object at key on target object
 
 ### Delete
 - `delete(opts = {})` : delete matches
+- `splice(opts = {})` : `splice` on target object (`start`, `deleteCount`, `insertObj` options)
 
 ### Set
 - `overwrite(obj, opts = {})` : set match to new object
@@ -135,6 +75,17 @@ This `condition` function has the signature:
 ### Delegation (general purpose)
 - `apply(fn, path)` : delegates to `jsonpath.apply`
 - `filter(fn, path)` : delegates to `jsonpath.filter`
+
+### Flatten/Unflatten
+
+Use the `flatten` and unflatten methods. First you must set the flattener to use, such as [flat](https://github.com/hughsk/flat)
+or soon to be `flat2` (WIP)
+
+### Mormalize
+
+Use the `normalize` method which uses [normalizr](https://www.npmjs.com/package/normalizr)
+
+For `flatten` and `normalize` usage examples, see the `Changelog.md` or the documentation for each module (`flat` and `normalizr`).  
 
 *All mutators can be chained beautifully :)*
 

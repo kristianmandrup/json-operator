@@ -1,6 +1,6 @@
 {
   "name": "json-operator",
-  "version": "1.2.3",
+  "version": "1.3.1",
   "description": "JSON operator for delete, set and merge using jsonpath",
   "homepage": "https://github.com/kristianmandrup/json-operator",
   "author": {
@@ -20,7 +20,7 @@
       "url": "https://github.com/kristianmandrup/json-operator/blob/master/LICENSE"
     }
   ],
-  "main": "index.js",
+  "main": "lib/index.js",
   "engines": {
     "node": ">= 6.0.0",
     "npm": ">=3.0.0"

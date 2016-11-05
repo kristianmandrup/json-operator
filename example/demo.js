@@ -1,4 +1,4 @@
-const JsonOperator = require('../index');
+const JsonOperator = require('../lib');
 const store = require('./store');
 
 // second book
@@ -51,3 +51,49 @@ operator.delete()
 let book3deleted = operator.value()
 console.log('book 3 deleted', book3deleted)
 console.log('store after all operations', operator.targetAsStr())
+
+// let nestedObj = {
+//   x: {
+//     a: {
+//       b: [
+//         {name: 'hel'}
+//       ],
+//       c: {
+//         name: 'hello'        
+//       }
+//     }
+//   },
+//   y: [],
+//   v: 'hello'
+// }
+
+// let keepOrFlat = function(node) {
+//   if (node.name && typeof node.name === 'string') return true
+//   if (Array,isArray(node)) return true
+//   if (typeof node === 'object') return false
+//   return true
+// }
+
+// let flatten = function(node) {
+//   if (typeof node !== 'object') return false  
+//   if (node.name) return false
+//   return true
+// }
+
+// let keep = function(node) {
+//   if (typeof node !== 'object') return true  
+//   if (node.name && typeof node.name === 'string') return true
+// }
+
+
+// operator.target = nestedObj
+
+// let conditions = {
+//   keepOrFlat, 
+//   flatten, 
+//   keep 
+// }
+
+// let flatObj = obj.flatten({sep: '.', conditions})
+
+// console.log(flatObj)
