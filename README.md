@@ -1,5 +1,7 @@
 # JSON Operator
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/kristianmandrup/json-operator.svg)](https://greenkeeper.io/)
+
 Perform efficient path based operations on JSON Objects (or most Javascript data object).
 
 Uses [jsonpath](https://github.com/kristianmandrup/jsonpath) with new `delete` option for `apply`.
