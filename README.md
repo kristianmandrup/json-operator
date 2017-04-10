@@ -81,7 +81,7 @@ This `condition` function has the signature:
 Use the `flatten` and unflatten methods. First you must set the flattener to use, such as [flat](https://github.com/hughsk/flat)
 or soon to be `flat2` (WIP)
 
-### Mormalize
+### Normalize
 
 Use the `normalize` method which uses [normalizr](https://www.npmjs.com/package/normalizr)
 
